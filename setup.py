@@ -54,7 +54,7 @@ setup(
     author_email = 'rkern@enthought.com',
     description = 'Cython bindings for the Cassowary constraint solver.',
     long_description = long_description,
-    url = 'http://pypi.python.org/pypi',
+    url = 'https://github.com/enthought/casuarius',
     ext_modules = [cysw_module],
     classifiers = [
         "Development Status :: 3 - Alpha",
