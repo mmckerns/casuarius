@@ -1,87 +1,76 @@
-// $Id: ClConstraint.h,v 1.34 1999/08/27 00:06:29 gjb Exp $
+// $Id: Constraint.h 172 2007-11-23 11:00:57Z svilen_dobrev $
 //
 // Cassowary Incremental Constraint Solver
 // Original Smalltalk Implementation by Alan Borning
 // This C++ Implementation by Greg J. Badros, <gjb@cs.washington.edu>
 // http://www.cs.washington.edu/homes/gjb
-// (C) 1998, 1999 Greg J. Badros and Alan Borning
+// ( C) 1998, 1999 Greg J. Badros and Alan Borning
 // See ../LICENSE for legal details regarding this software
 //
-// ClConstraint.h
+// Constraint.h
 
-#ifndef ClConstraint_H
-#define ClConstraint_H
+#ifndef Constraint_H
+#define Constraint_H
 
-#if defined(HAVE_CONFIG_H) && !defined(CONFIG_H_INCLUDED) && !defined(CONFIG_INLINE_H_INCLUDED)
+#if defined( HAVE_CONFIG_H) && !defined( CONFIG_H_INCLUDED) && !defined( CONFIG_INLINE_H_INCLUDED)
 #include <cassowary/config-inline.h>
 #define CONFIG_INLINE_H_INCLUDED
 #endif
 
-#include "debug.h"
 
 #include "Cassowary.h"
-#include "ClLinearExpression.h"
-#include "ClStrength.h"
+#include "LinearExpression.h"
+#include "Strength.h"
 #include <set>
 #include <string>
+#include "my/refcnt.h"
 
-class ClSimplexSolver;
-class ClFDSolver;
-class ClBlueSolver;
+class SimplexSolver;
+class FDSolver;
+class BlueSolver;
 
 // enum setup so additive inverse flips the direction of the inequality
-enum ClCnRelation {cnEQ = 0, cnNEQ = 100, cnLEQ = 2, cnGEQ = -2, cnLT = 3, cnGT = -3 };
+enum CnRelation {cnEQ = 0, cnNEQ = 100, cnLEQ = 2, cnGEQ = -2, cnLT = 3, cnGT = -3 };
 
-inline enum ClCnRelation
-ReverseInequality(enum ClCnRelation c)
+inline enum CnRelation
+ReverseInequality( enum CnRelation c)
 {
-  if (c != cnNEQ)
-    c = (enum ClCnRelation) (- int(c));
+  if ( c != cnNEQ)
+    c = ( enum CnRelation) (- int( c));
   return c;
 }
 
 inline string
-StrCnRelation(ClCnRelation rel) {
-  switch (rel) {
+StrCnRelation( CnRelation rel) {
+  switch ( rel) {
   case cnEQ: return "=";
   case cnNEQ: return "=/=";
   case cnLEQ: return "<=";
   case cnGEQ: return ">=";
   case cnLT: return "<";
   case cnGT: return ">";
-  default: assert(false);
+  default: assert( false);
   }
 }
 
 
 
 #ifdef USE_GC_CONSTRAINT
-class ClConstraint : public gc {
+class Constraint : public gc {
 #else
-class ClConstraint {
+class Constraint {
 #endif
+    REFCOUNT_DEF                 //from nref.h
 public:
 
-  ClConstraint(const ClStrength &strength = ClsRequired(), double weight = 1.0 ) :
-    _strength(strength),
-    _readOnlyVars(),
-    _weight(weight),
-    _pv(0),
-    _times_added(0)
-    { 
-      CtrTracer(__FUNCTION__,this);
-    }
+  Constraint( const Strength & strength = sRequired(), double weight = 1.0 );
+  virtual ~Constraint();
 
-  virtual ~ClConstraint()
-    { 
-      DtrTracer(__FUNCTION__,this);
-    }
-
-  // Return my linear Expression.  (For linear equations, this
-  // constraint represents Expression=0; for linear inequalities it
-  // represents Expression>=0.)
-  virtual ClLinearExpression Expression() const
-    { assert(false); }
+  // Return (copyof) my linear Expression.
+  // For linear equations, this constraint represents Expression=0;
+  // for linear inequalities it represents Expression>=0.
+  virtual LinearExpression Expression() const
+    { assert( false); return 0; }
 
   // Returns true if this is an edit constraint
   virtual bool IsEditConstraint() const
@@ -102,100 +91,95 @@ public:
   virtual bool isStayConstraint() const
     { return false; }
 
-  virtual const ClStrength &strength() const
+  virtual const Strength & strength() const
     { return _strength; }
 
   virtual double weight() const
     { return _weight; }
 
 #ifndef CL_NO_IO
-  virtual ostream &PrintOn(ostream &xo) const = 0;
-
-  friend ostream& operator<<(ostream &xos, const ClConstraint &constraint)
-    { constraint.PrintOn(xos); return xos; }
-
+  virtual ostream & PrintOn( ostream & xo) const = 0;
+  friend ostream& operator<<( ostream & xos, const Constraint & constraint)
+    { constraint.PrintOn( xos); return xos; }
 #endif
 
 
-  void SetPv(void *pv)
-    { _pv = pv; }
-
-  void *Pv() const
-    { return _pv; }
+#ifdef CL_PV
+  void SetPv( void * pv) { _pv = pv; }
+  void * Pv() const { return _pv; }
+#endif
 
   virtual bool FIsSatisfied() const { return false; }
-
   virtual bool FIsInSolver() const { return _times_added != 0; }
-
   virtual bool FIsOkayForSimplexSolver() const { return true; }
 
-  void ChangeStrength( const ClStrength &strength) 
-    { 
-      if (_times_added == 0) {
-        setStrength(strength);
+  void ChangeStrength( const Strength & strength)
+    {
+      if ( _times_added == 0) {
+        setStrength( strength);
       } else {
         throw ExCLTooDifficult();
       }
     }
 
   void ChangeWeight( double weight )
-    { 
-      if (_times_added == 0) {
-        setWeight(weight);
+    {
+      if ( _times_added == 0) {
+        setWeight( weight);
       } else {
         throw ExCLTooDifficult();
       }
     }
 
-  bool FIsReadOnlyVar(ClVariable v) const { 
-    return !(_readOnlyVars.find(v) == _readOnlyVars.end());
+  bool FIsReadOnlyVar( Variable v) const {
+    return !( _readOnlyVars.find( v) == _readOnlyVars.end());
   }
 
-  const ClVarSet &ReadOnlyVars() const {
+  const VarSet & ReadOnlyVars() const {
     return _readOnlyVars;
   }
 
-  ClConstraint &AddROVars(const ClVarSet &setClv) {
-    for ( ClVarSet::const_iterator it = setClv.begin(); 
-          it != setClv.end(); ++it) {
+  Constraint & AddROVars( const VarSet & setv) {
+    for ( VarSet::const_iterator it = setv.begin();
+          it != setv.end(); ++it) {
       _readOnlyVars.insert(*it);
     }
-    return *this;
+    return * this;
   }
 
-  friend ClSimplexSolver;
-  friend ClFDSolver;
-  friend ClBlueSolver;
+  friend class SimplexSolver;
+  friend class FDSolver;
+  friend class BlueSolver;
 private:
 
-  ClSymbolicWeight symbolicWeight() const {
+  SymbolicWeight symbolicWeight() const {
     return _strength.symbolicWeight();
   }
 
-  void addedTo(const ClSimplexSolver &)
+  void addedTo( const SimplexSolver & )
     { ++_times_added; }
 
-  void removedFrom(const ClSimplexSolver &)
+  void removedFrom( const SimplexSolver & )
     { --_times_added; }
 
-  void setStrength( const ClStrength &strength )
+  void setStrength( const Strength & strength )
     { _strength = strength; }
 
   void setWeight( double weight )
     { _weight = weight; }
 
   /// instance variables
-  ClStrength _strength;
+  Strength _strength;
 
-  ClVarSet _readOnlyVars;
+  VarSet _readOnlyVars;
 
   double _weight;
 
-  void *_pv;
+  void * _pv;
 
   int _times_added;
 };
 
-typedef ClConstraint *PClConstraint;
+#include "Constraint_P.h"
 
 #endif

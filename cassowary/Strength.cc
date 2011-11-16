@@ -1,15 +1,15 @@
-// $Id: ClStrength.cc,v 1.18 1999/04/20 00:25:16 gjb Exp $
+// $Id: Strength.cc,v 1.1.1.1 2003/01/15 14:06:21 svilen Exp $
 //
 // Cassowary Incremental Constraint Solver
 // Original Smalltalk Implementation by Alan Borning
 // This C++ Implementation by Greg J. Badros, <gjb@cs.washington.edu>
 // http://www.cs.washington.edu/homes/gjb
-// (C) 1998, 1999 Greg J. Badros and Alan Borning
+// ( C) 1998, 1999 Greg J. Badros and Alan Borning
 // See ../LICENSE for legal details regarding this software
 //
-// ClStrength.cc
+// Strength.cc
 
-#include "ClStrength.h"
+#include "Strength.h"
 
 #ifdef HAVE_CONFIG_H
 #include <cassowary/config.h>
@@ -17,36 +17,35 @@
 #endif
 
 // Use the singleton pattern for the strength objects
-const ClStrength &ClsRequired()
+const Strength & sRequired()
 {
-  // required is distinct by equality to this static object,
+  // required is distinct by the isRequired flag,
   // but I still use an especially high symbolic weight, just in case
-  // FIXGJB: hack?
-  static ClStrength required_strength("<Required>", 1000, 1000, 1000);
+  static Strength required_strength("<Required>", 1000, 1000, 1000, true);
   return required_strength;
 }
 
-const ClStrength &ClsStrong()
+const Strength & sStrong()
 {
-  static ClStrength strong_strength("strong", 1.0, 0.0, 0.0);
+  static Strength strong_strength("strong", 1.0, 0.0, 0.0);
   return strong_strength;
 }
 
-const ClStrength &ClsMedium()
+const Strength & sMedium()
 {
-  static ClStrength medium_strength("medium", 0.0, 1.0, 0.0);
+  static Strength medium_strength("medium", 0.0, 1.0, 0.0);
   return medium_strength;
 }
 
 
-const ClStrength &ClsWeak()
+const Strength & sWeak()
 {
-  static ClStrength weak_strength("weak", 0.0, 0.0, 1.0);
+  static Strength weak_strength("weak", 0.0, 0.0, 1.0);
   return weak_strength;
 }
 
 // special case for when nLevels = 3, should assert nLevels() == 3
-ClStrength::ClStrength(const string &Name, double w1, double w2, double w3) :
-  _name(Name), _symbolicWeight(w1, w2, w3)
+Strength::Strength( const string & Name, double w1, double w2, double w3, bool isRequired) :
+  _name( Name), _symbolicWeight( w1, w2, w3), _isRequired(isRequired)
 { 
 }

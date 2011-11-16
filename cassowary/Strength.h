@@ -1,54 +1,54 @@
-// $Id: ClStrength.h,v 1.20 1999/04/20 00:25:17 gjb Exp $
+// $Id: Strength.h 172 2007-11-23 11:00:57Z svilen_dobrev $
 //
 // Cassowary Incremental Constraint Solver
 // Original Smalltalk Implementation by Alan Borning
 // This C++ Implementation by Greg J. Badros, <gjb@cs.washington.edu>
 // http://www.cs.washington.edu/homes/gjb
-// (C) 1998, 1999 Greg J. Badros and Alan Borning
+// ( C) 1998, 1999 Greg J. Badros and Alan Borning
 // See ../LICENSE for legal details regarding this software
 //
-// ClStrength.h
+// Strength.h
 
-#ifndef ClStrength_H
-#define ClStrength_H
+#ifndef Strength_H
+#define Strength_H
 
-#if defined(HAVE_CONFIG_H) && !defined(CONFIG_H_INCLUDED) && !defined(CONFIG_INLINE_H_INCLUDED)
+#if defined( HAVE_CONFIG_H) && !defined( CONFIG_H_INCLUDED) && !defined( CONFIG_INLINE_H_INCLUDED)
 #include <cassowary/config-inline.h>
 #define CONFIG_INLINE_H_INCLUDED
 #endif
 
 #include "Cassowary.h"
-#include "ClSymbolicWeight.h"
+#include "SymbolicWeight.h"
 
-class ClStrength;
+class Strength;
 
-const ClStrength &ClsRequired();
-const ClStrength &ClsStrong();
-const ClStrength &ClsMedium();
-const ClStrength &ClsWeak();
+const Strength & sRequired();
+const Strength & sStrong();
+const Strength & sMedium();
+const Strength & sWeak();
 
 #ifdef USE_GC_STRENGTH
-class ClStrength : public gc {
+class Strength : public gc {
 #else
-class ClStrength {
+class Strength {
 #endif
  public:
 
-  ClStrength(const string &Name, const ClSymbolicWeight &symbolicWeight) :
-    _name(Name), _symbolicWeight(symbolicWeight)
+  Strength( const string & Name, const SymbolicWeight & symbolicWeight, bool isRequired=false) :
+    _name( Name), _symbolicWeight( symbolicWeight), _isRequired( isRequired)
     { }
 
   // special case for when nLevels = 3, should assert nLevels() == 3
-  ClStrength(const string &Name, double w1, double w2, double w3);
+  Strength( const string & Name, double w1, double w2, double w3, bool isRequired=false);
 
-  virtual ~ClStrength()
+  virtual ~Strength()
     { }
 
   virtual bool IsRequired() const
-    { return (_symbolicWeight == ClsRequired()._symbolicWeight); }
+    { return _isRequired; }
 
 #ifndef CL_NO_IO
-  virtual ostream &PrintOn(ostream &xo) const
+  virtual ostream & PrintOn( ostream & xo) const
     { 
     xo << Name(); 
     if (!IsRequired())
@@ -56,36 +56,36 @@ class ClStrength {
     return xo; 
     }
 
-  friend ostream& operator<<(ostream &xos, const ClStrength &Cls)
-    { Cls.PrintOn(xos); return xos; }
+  friend ostream& operator<<( ostream & xos, const Strength & s)
+    { s.PrintOn( xos); return xos; }
 
 #endif
 
-  virtual const ClSymbolicWeight &symbolicWeight() const
+  virtual const SymbolicWeight & symbolicWeight() const
     { return _symbolicWeight; }
 
-  void SetPv(void *pv)
-    { _pv = pv; }
-
-  void *Pv() const
-    { return _pv; }
+#ifdef CL_PV
+  void SetPv( void * pv) { _pv = pv; } 
+  void * Pv() const { return _pv; }
+#endif
 
  private:
   string Name() const
     { return _name; }
 
-  void SetName(string Name)
+  void SetName( string Name)
     { _name = Name; }
 
-  void SetSymbolicWeight(const ClSymbolicWeight &symbolicWeight)
+  void SetSymbolicWeight( const SymbolicWeight & symbolicWeight)
     { _symbolicWeight = symbolicWeight; }
 
   // instance variables
   string _name;
-  ClSymbolicWeight _symbolicWeight;
-
-  void *_pv;
-
+  SymbolicWeight _symbolicWeight;
+  bool _isRequired;
+#ifdef CL_PV
+  void * _pv;
+#endif
 };
 
 #endif

@@ -1,59 +1,56 @@
-// $Id: ClLinearConstraint.h,v 1.18 1999/05/02 00:43:51 gjb Exp $
+// $Id: LinearConstraint.h 172 2007-11-23 11:00:57Z svilen_dobrev $
 //
 // Cassowary Incremental Constraint Solver
 // Original Smalltalk Implementation by Alan Borning
 // This C++ Implementation by Greg J. Badros, <gjb@cs.washington.edu>
 // http://www.cs.washington.edu/homes/gjb
-// (C) 1998, 1999 Greg J. Badros and Alan Borning
+// ( C) 1998, 1999 Greg J. Badros and Alan Borning
 // See ../LICENSE for legal details regarding this software
 //
-// ClLinearConstraint.h
+// LinearConstraint.h
 
-#ifndef ClLinearConstraint_H
-#define ClLinearConstraint_H
+#ifndef LinearConstraint_H
+#define LinearConstraint_H
 
-#if defined(HAVE_CONFIG_H) && !defined(CONFIG_H_INCLUDED) && !defined(CONFIG_INLINE_H_INCLUDED)
+#if defined( HAVE_CONFIG_H) && !defined( CONFIG_H_INCLUDED) && !defined( CONFIG_INLINE_H_INCLUDED)
 #include <cassowary/config-inline.h>
 #define CONFIG_INLINE_H_INCLUDED
 #endif
 
 #include "Cassowary.h"
-#include "ClConstraint.h"
-#include "ClLinearExpression.h"
+#include "Constraint.h"
+#include "LinearExpression.h"
 
+// Add the LinearExpression member variable needed for both
+// LinearEquation and LinearInequality
 
-// Add the ClLinearExpression member variable needed for both
-// ClLinearEquation and ClLinearInequality
-class ClLinearConstraint : public ClConstraint {
- private: typedef ClConstraint super;
-
+class LinearConstraint : public Constraint {
  public:
 
-  // Constructor
-  ClLinearConstraint(const ClLinearExpression &cle,
-		     const ClStrength &strength = ClsRequired(),
-		     double weight = 1.0) :
-    ClConstraint(strength, weight),
-    _expression(cle)
-    { }
+    LinearConstraint( const LinearExpression & cle,
+                      const Strength & strength = sRequired(),
+                      double weight = 1.0)
+        : Constraint( strength, weight)
+        , _expression( cle)       //my own copy
+        , _holder( &_expression )
+        { }
 
-  // Return my linear Expression.  (For linear equations, this
+  // Return my linear Expression.  ( For linear equations, this
   // constraint represents Expression=0; for linear inequalities it
   // represents Expression>=0.)
-  ClLinearExpression Expression() const
-    { return _expression; }
+    LinearExpression Expression() const { return _expression; }
 
-  // do not do this if *this is inside a solver
-  void ChangeConstant(Number constant)
-    { _expression.Set_constant(constant); }
+  // do not do this if * this is inside a solver
+    void ChangeConstant( Number constant) { _expression.Set_constant( constant); }
 
  protected:
-
-  ClLinearExpression _expression;
-
-  virtual void setExpression( const ClLinearExpression &expr)
-    { _expression = expr; }
-
+    LinearExpression _expression;
+    virtual void setExpression( const LinearExpression & expr) { _expression = expr; }
+ private:
+    P_LinearExpression_holder _holder;
 };
+
+#include "my/refcntp.h"
+typedef RefCountPtr_Subclass< LinearConstraint, Constraint> P_LinearConstraint;
 
 #endif

@@ -1,12 +1,10 @@
-// $Id: ClDummyVariable.cc,v 1.2 1999/03/18 00:07:03 gjb Exp $
+// $Id: DummyVariable.cc,v 1.1.1.1 2003/01/15 14:06:20 svilen Exp $
 
-#include "ClDummyVariable.h"
+#include "DummyVariable.h"
 
 #ifdef HAVE_CONFIG_H
 #include <cassowary/config.h>
 #define CONFIG_H_INCLUDED
 #endif
 
-#ifdef CL_FIND_LEAK
-long ClDummyVariable::cDummyVariables = 0;
-#endif
+DummyVariable::~DummyVariable() {}

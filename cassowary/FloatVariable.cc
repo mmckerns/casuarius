@@ -1,15 +1,15 @@
-// $Id: ClFloatVariable.cc,v 1.8 1999/04/30 00:12:17 gjb Exp $
+// $Id: FloatVariable.cc,v 1.2 2003/05/23 11:10:45 svilen Exp $
 //
 // Cassowary Incremental Constraint Solver
 // Original Smalltalk Implementation by Alan Borning
 // This C++ Implementation by Greg J. Badros, <gjb@cs.washington.edu>
 // http://www.cs.washington.edu/homes/gjb
-// (C) 1998, 1999 Greg J. Badros and Alan Borning
+// ( C) 1998, 1999 Greg J. Badros and Alan Borning
 // See ../LICENSE for legal details regarding this software
 //
-// ClFloatVariable.cc
+// FloatVariable.cc
 
-#include "ClFloatVariable.h"
+#include "FloatVariable.h"
 
 #ifdef HAVE_CONFIG_H
 #include <cassowary/config.h>
@@ -17,9 +17,10 @@
 #endif
 
 #ifndef CL_NO_IO
-ostream &ClFloatVariable::PrintOn(ostream &xo) const
+ostream & FloatVariable::PrintOn( ostream & xo) const
 {  
   xo << "[" << Name() << ":" << _value << "]";
+//    xo << this <<"#";
   return xo;
 }
 #endif

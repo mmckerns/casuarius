@@ -1,112 +1,111 @@
-// $Id: ClSolver.h,v 1.4 1999/04/29 09:45:30 gjb Exp $
+// $Id: Solver.h 172 2007-11-23 11:00:57Z svilen_dobrev $
 //
 // Cassowary Incremental Constraint Solver
 // Original Smalltalk Implementation by Alan Borning
 // This C++ Implementation by Greg J. Badros, <gjb@cs.washington.edu>
 // http://www.cs.washington.edu/homes/gjb
-// (C) 1998, 1999 Greg J. Badros and Alan Borning
+// ( C) 1998, 1999 Greg J. Badros and Alan Borning
 // See ../LICENSE for legal details regarding this software
 //
-// ClSolver.h
+// Solver.h
 
-#ifndef ClSolver_H
-#define ClSolver_H
+#ifndef Solver_H
+#define Solver_H
 
-#if defined(HAVE_CONFIG_H) && !defined(CONFIG_H_INCLUDED) && !defined(CONFIG_INLINE_H_INCLUDED)
+#if defined( HAVE_CONFIG_H) && !defined( CONFIG_H_INCLUDED) && !defined( CONFIG_INLINE_H_INCLUDED)
 #include <cassowary/config-inline.h>
 #define CONFIG_INLINE_H_INCLUDED
 #endif
 
 #include "Cassowary.h"
-#include "ClErrors.h"
-#include "ClTypedefs.h"
+#include "Errors.h"
+#include "Typedefs.h"
 #include <list>
 
-class ClVariable;
+class Variable;
 
-// ClSolver is an abstract base class
-class ClSolver {
+// Solver is an abstract base class
+class Solver {
  public:
 
-  ClSolver() : _pv(0), _fAutosolve(true), _pfnChangeClvCallback(0) { }
+  Solver() : _pv( 0), _fAutosolve( true), _pfnChangevCallback( 0) { }
 
-  virtual ~ClSolver()
+  virtual ~Solver()
     { } 
 
   // Add the constraint cn to the solver
-  virtual ClSolver &AddConstraint(ClConstraint *const pcn) = 0;
+  virtual Solver & AddConstraint( P_Constraint ) = 0;
 
   // Remove the constraint cn from the solver
-  virtual ClSolver &RemoveConstraint(ClConstraint *const pcn) = 0;
+  virtual Solver & RemoveConstraint( P_Constraint ) = 0;
 
   // Same as above, but returns false if the constraint cannot be solved
-  // (i.e., the resulting system would be unsatisfiable)
+  // ( i.e., the resulting system would be unsatisfiable)
   // The above function "AddConstraint" throws an exception in that case
   // which may be inconvenient
-  virtual bool AddConstraintNoException(ClConstraint *const pcn)
+  bool AddConstraintNoException( P_Constraint pcn)
     {
       try {
-          AddConstraint(pcn);
+          AddConstraint( pcn);
           return true;
       }
-      catch (const ExCLRequiredFailure &e)
+      catch ( const ExCLRequiredFailure & e)
         { return false; }
-      catch (const ExCLTooDifficult &e)
+      catch ( const ExCLTooDifficult & e)
         { return false; }
     }
 
-#ifndef CL_NO_DEPRECATED
+#ifdef CL_NO_DEPRECATED
   // Deprecated --02/22/99 gjb
-  bool AddConstraintNoException(ClConstraint &cn)
+  bool AddConstraintNoException( Constraint & cn)
     { return AddConstraintNoException(&cn); }
 #endif
 
-  virtual bool RemoveConstraintNoException(ClConstraint *const pcn)
+  bool RemoveConstraintNoException( P_Constraint pcn)
     {
       try {
-        RemoveConstraint(pcn);
+        RemoveConstraint( pcn);
         return true;
       }
-      catch (const ExCLConstraintNotFound &e)
+      catch ( const ExCLConstraintNotFound & e)
         { return false; }
     }
 
-#ifndef CL_NO_DEPRECATED
+#ifdef CL_NO_DEPRECATED
   // Deprecated --02/22/99 gjb
-  bool RemoveConstraintNoException(ClConstraint &cn)
+  bool RemoveConstraintNoException( Constraint & cn)
     { return RemoveConstraintNoException(&cn); }
 #endif
 
 
-  virtual ClSolver &Solve()
-    { assert(false); return *this; }
+  virtual Solver & Solve()
+    { assert( false); return * this; }
 
-  virtual bool SolveNoException()
+  bool SolveNoException()
     {
       try {
         Solve();
         return true;
       }
-      catch (const ExCLTooDifficult &e)
+      catch ( const ExCLTooDifficult & e)
         { return false; }
-      catch (const ExCLRequiredFailure &e)
+      catch ( const ExCLRequiredFailure & e)
         { return false; }
     }
 
 
   virtual void Resolve()
-    { assert(false); }
+    { assert( false); }
 
-  void SetPv(void *pv)
-    { _pv = pv; }
+#ifdef CL_PV
+  void SetPv( void * pv) { _pv = pv; } 
+  void * Pv() const { return _pv; }
+#endif
+  
+  typedef void (*PfnChangevCallback)( Variable * pclv, Solver * psolver);
 
-  void *Pv() const
-    { return _pv; }
-
-  typedef void (*PfnChangeClvCallback)(ClVariable *pclv, ClSolver *psolver);
-
-  void SetChangeClvCallback(PfnChangeClvCallback pfn)
-    { _pfnChangeClvCallback = pfn; }
+  void SetChangevCallback( PfnChangevCallback pfn)
+    { _pfnChangevCallback = pfn; }
 
   // Control whether optimization and setting of external variables
   // is done automatically or not.  By default it is done
@@ -114,12 +113,12 @@ class ClSolver {
   // called by client code; if SetAutosolve is put to false,
   // then solve() needs to be invoked explicitly before using
   // variables' values
-  // (Turning off autosolve while adding lots and lots of
-  // constraints [ala the addDel test in ClTests] saved
+  // ( Turning off autosolve while adding lots and lots of
+  // constraints [ala the addDel test in Tests] saved
   // about 20% in runtime, from 68sec to 54sec for 900 constraints,
   // with 126 failed adds)
-  ClSolver &SetAutosolve(bool f)
-    { _fAutosolve = f; if (f) Solve(); return *this; }
+  Solver & SetAutosolve( bool f)
+    { _fAutosolve = f; if ( f) Solve(); return * this; }
 
   // Tell whether we are autosolving
   bool FIsAutosolving() const
@@ -127,36 +126,36 @@ class ClSolver {
 
 
 #ifndef CL_NO_IO
-  friend ostream &operator<<(ostream &xo, const ClSolver &solver);
+  friend ostream & operator<<( ostream & xo, const Solver & solver);
 
-  virtual ostream &PrintOn(ostream &xo) const = 0;
+  virtual ostream & PrintOn( ostream & xo) const = 0;
 
 #endif  
 
  protected:
 
   // C-style extension mechanism so I
-  // don't have to wrap ScwmClSolver separately
-  void *_pv;
+  // don't have to wrap ScwmSolver separately
+  void * _pv;
 
   bool _fAutosolve;
 
-  PfnChangeClvCallback _pfnChangeClvCallback;
+  PfnChangevCallback _pfnChangevCallback;
 };
 
 
 #ifndef CL_NO_IO
-ostream &PrintTo(ostream &xo, const ClVarVector &varlist);
-ostream &operator<<(ostream &xo, const ClVarVector &varlist);
+ostream & PrintTo( ostream & xo, const VarVector & varlist);
+ostream & operator<<( ostream & xo, const VarVector & varlist);
 
-ostream &PrintTo(ostream &xo, const ClConstraintToVarSetMap &mapCnToVarSet);
-ostream &operator<<(ostream &xo, const ClConstraintToVarSetMap &mapCnToVarSet);
+ostream & PrintTo( ostream & xo, const ConstraintToVarSetMap & mapCnToVarSet);
+ostream & operator<<( ostream & xo, const ConstraintToVarSetMap & mapCnToVarSet);
 
-ostream &PrintTo(ostream &xo, const ClConstraintSet &setCn);
-ostream &operator<<(ostream &xo, const ClConstraintSet &setCn);
+ostream & PrintTo( ostream & xo, const ConstraintSet & setCn);
+ostream & operator<<( ostream & xo, const ConstraintSet & setCn);
 
-ostream &PrintTo(ostream &xo, const list<FDNumber> &listFDN);
-ostream &operator<<(ostream &xo, const list<FDNumber> &listFDN);
+ostream & PrintTo( ostream & xo, const list<FDNumber> & listFDN);
+ostream & operator<<( ostream & xo, const list<FDNumber> & listFDN);
 
 #endif
 
