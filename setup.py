@@ -14,6 +14,10 @@ bindings:
 
     http://pypi.python.org/pypi/cassowarypy
 
+His modifications are available under the BSD license, while Casuarius as
+a whole follows the license of Cassowary itself, LGPL v2.1 or (at your option)
+a later version of the LGPL. See the files LICENSE and COPYING.LGPL for details.
+
 Please be sure to have Cython 0.15.1 or above in order to compile this extension
 module. It has been tested on OS X (using llvm-gcc 4.2) and Windows (using
 mingw). Other Windows C++ compilers may or may not work.
@@ -52,7 +56,6 @@ setup(
     long_description = long_description,
     url = 'http://pypi.python.org/pypi',
     ext_modules = [cysw_module],
-    license = "LGPL",
     classifiers = [
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
