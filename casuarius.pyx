@@ -656,10 +656,12 @@ cdef class EQConstraint(LinearConstraint):
 cdef class Solver:
     cdef ClSimplexSolver *solver
     cdef bint _autosolve
+    cdef bint _explaining
 
-    def __cinit__(self, bint autosolve=False):
+    def __cinit__(self, bint autosolve=False, bint explaining=True):
         self.solver = new ClSimplexSolver()
         self.autosolve = autosolve
+        self.explaining = explaining
 
     property autosolve:
         def __get__(self):
@@ -668,6 +670,14 @@ cdef class Solver:
         def __set__(self, bint autosolve):
             self._autosolve = autosolve
             self.solver.SetAutosolve(autosolve)
+
+    property explaining:
+        def __get__(self):
+            return self._explaining
+
+        def __set__(self, bint explaining):
+            self._explaining = explaining
+            self.solver.SetExplaining(explaining)
 
     def __dealloc__(self):
         del self.solver
