@@ -458,6 +458,13 @@ cdef class LinearExpression(LinearSymbolic):
         self.terms = self.reduce_terms(terms)
         self.constant = constant
 
+    property value:
+        def __get__(self):
+            cdef double value=self.constant
+            for term in self.terms:
+                value += term.coeff * term.var.value
+            return value
+
     def __repr__(self):
         if len(self.terms) > 0:
             s = sorted(self.terms, key=operator.attrgetter('var.name'))
