@@ -127,13 +127,13 @@ ostream &
 Tableau::printExternalVariablesTo( ostream & xo) const
 {
   xo << "Parametric: ";
-  VarSet::iterator itParVars = _externalParametricVars.begin();
+  VarSet::const_iterator itParVars = _externalParametricVars.begin();
   for ( ; itParVars != _externalParametricVars.end(); ++itParVars ) {
     Variable v = * itParVars;
     xo << v << " ";
   }
   xo << "\nBasic: ";
-  VarSet::iterator itRowVars = _externalRows.begin();
+  VarSet::const_iterator itRowVars = _externalRows.begin();
   for ( ; itRowVars != _externalRows.end() ; ++itRowVars ) {
     Variable v = * itRowVars;
     xo << v << " ";

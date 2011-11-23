@@ -388,7 +388,7 @@ class VarInVarSet : public unary_function<Variable,bool> {
 public:
   VarInVarSet( const VarSet & clvset) : 
       _set( clvset),
-      _setEnd( clvset.end()) 
+      _setEnd( const_cast<VarSet &>(clvset).end() ) 
     { }
 
   bool operator ()( const Variable & clv) const {
