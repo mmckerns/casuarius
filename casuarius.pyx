@@ -336,7 +336,7 @@ cdef class ConstraintVariable(LinearSymbolic):
         return 'ConstraintVariable({0!r}, {1!r})'.format(self.name, self.variable.Value())
 
     def __str__(self):
-        return self.name
+        return '{0}:{1}'.format(self.name, self.value)
 
     def __add__(self, other):
         if not isinstance(self, LinearSymbolic):
@@ -393,12 +393,12 @@ cdef class Term(LinearSymbolic):
 
     def __str__(self):
         if self.coeff == 1.0:
-            template = '{name}'
+            template = '{name}:{value}'
         elif self.coeff == -1.0:
-            template = '-{name}'
+            template = '-{name}:{value}'
         else:
-            template = '{coeff} * {name}'
-        return template.format(coeff=self.coeff, name=self.var.name)
+            template = '{coeff} * {name}:{value}'
+        return template.format(coeff=self.coeff, name=self.var.name, value=self.var.value)
 
     def __add__(self, other):
         if not isinstance(self, LinearSymbolic):
@@ -631,6 +631,10 @@ cdef class LEConstraint(LinearConstraint):
         inequality = newLinearInequality(self.lhs.as_cl_linear_expression(), cnLEQ, self.rhs.as_cl_linear_expression(), deref(self._strength.strength), self._weight)
         return inequality
 
+    property error:
+        def __get__(self):
+            return self.lhs.value - self.rhs.value
+
 cdef class GEConstraint(LinearConstraint):
 
     def __init__(self, lhs, rhs, Strength strength=required, double weight=1.0):
@@ -644,6 +648,10 @@ cdef class GEConstraint(LinearConstraint):
 
         inequality = newLinearInequality(self.lhs.as_cl_linear_expression(), cnGEQ, self.rhs.as_cl_linear_expression(), deref(self._strength.strength), self._weight)
         return inequality
+
+    property error:
+        def __get__(self):
+            return self.rhs.value - self.lhs.value
 
 cdef class EQConstraint(LinearConstraint):
 
@@ -659,6 +667,9 @@ cdef class EQConstraint(LinearConstraint):
         equation = newLinearEquation(self.lhs.as_cl_linear_expression(), self.rhs.as_cl_linear_expression(), deref(self._strength.strength), self._weight)
         return equation
 
+    property error:
+        def __get__(self):
+            return abs(self.rhs.value - self.lhs.value)
 
 cdef class Solver:
     cdef ClSimplexSolver *solver
