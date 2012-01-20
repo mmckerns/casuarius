@@ -1,5 +1,4 @@
 MANIFEST
-casuarius.cpp
 casuarius.egg-info/
 *.o
 build/
