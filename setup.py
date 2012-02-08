@@ -1,6 +1,5 @@
 from distutils.core import setup
 from distutils.extension import Extension
-from distutils.log import warn
 
 from Cython.Distutils import build_ext
 cmdclass = dict(build_ext=build_ext)
@@ -49,7 +48,7 @@ cysw_module = Extension(
 
 setup(
     name = 'casuarius',
-    version = '0.0.1',
+    version = '1.0b1',
     author = 'Robert Kern',
     author_email = 'rkern@enthought.com',
     description = 'Cython bindings for the Cassowary constraint solver.',
@@ -57,7 +56,7 @@ setup(
     url = 'https://github.com/enthought/casuarius',
     ext_modules = [cysw_module],
     classifiers = [
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
         "Operating System :: OS Independent",
