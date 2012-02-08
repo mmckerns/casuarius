@@ -1,6 +1,8 @@
 include MANIFEST.in
 include COPYING.LGPL
 include LICENSE
+include README.rst
 include cysw_support.h
+include casuarius.cpp
 recursive-include cassowary *.h
 recursive-include cassowary *.h.in
