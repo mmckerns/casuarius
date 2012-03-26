@@ -633,7 +633,7 @@ cdef class LEConstraint(LinearConstraint):
 
     property error:
         def __get__(self):
-            return self.lhs.value - self.rhs.value
+            return max(self.lhs.value - self.rhs.value, 0.0)
 
 cdef class GEConstraint(LinearConstraint):
 
@@ -651,7 +651,7 @@ cdef class GEConstraint(LinearConstraint):
 
     property error:
         def __get__(self):
-            return self.rhs.value - self.lhs.value
+            return max(self.rhs.value - self.lhs.value, 0.0)
 
 cdef class EQConstraint(LinearConstraint):
 
