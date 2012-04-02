@@ -21,9 +21,11 @@ std::vector<size_t> get_cpp_exception_constraint_pointers() {
     }
     catch (const ExCLError &exn) {
         const ConstraintSet* cset = exn.explanation();
-        ConstraintSet::const_iterator it = cset->begin();
-        for (; it != cset->end(); ++it) {
-            constraint_pointers.push_back(reinterpret_cast<size_t>((*it).ptr()));
+        if (cset != NULL) {
+            ConstraintSet::const_iterator it = cset->begin();
+            for (; it != cset->end(); ++it) {
+                constraint_pointers.push_back(reinterpret_cast<size_t>((*it).ptr()));
+            }
         }
     }
     return constraint_pointers;
