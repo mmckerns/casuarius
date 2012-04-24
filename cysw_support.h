@@ -1,4 +1,3 @@
-#include "stdint.h"
 #include <string>
 #include <vector>
 #include "cassowary/SimplexSolver.h"
