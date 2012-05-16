@@ -48,7 +48,7 @@ cysw_module = Extension(
 
 setup(
     name = 'casuarius',
-    version = '1.0b1',
+    version = '1.0',
     author = 'Robert Kern',
     author_email = 'rkern@enthought.com',
     description = 'Cython bindings for the Cassowary constraint solver.',
