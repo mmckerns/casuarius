@@ -190,7 +190,7 @@ cdef class SymbolicWeight:
         return 'SymbolicWeight({0!r})'.format(self.weights)
 
     def __hash__(self):
-        return id(self)
+        return object.__hash__(self)
 
 
 cdef class Strength:
@@ -219,7 +219,7 @@ cdef class Strength:
         return repr(self.name)
 
     def __hash__(self):
-        return id(self)
+        return object.__hash__(self)
 
 
 required = Strength('required', SymbolicWeight((1000.0, 1000.0, 1000.0)), is_required=True)
@@ -355,7 +355,7 @@ cdef class LinearSymbolic:
         return EQConstraint(self, rhs)
 
     def __hash__(self):
-        return id(self)
+        return object.__hash__(self)
 
 
 cdef class ConstraintVariable(LinearSymbolic):
@@ -666,7 +666,7 @@ cdef class LinearConstraint:
         return self.__or__(other)
 
     def __hash__(self):
-        return id(self)
+        return object.__hash__(self)
 
     cdef P_Constraint *as_cl_linear_constraint(self):
         return NULL
