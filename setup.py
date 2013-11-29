@@ -1,7 +1,6 @@
-from distutils.core import setup
-from distutils.extension import Extension
-
 from Cython.Distutils import build_ext
+from setuptools import setup, Extension
+
 cmdclass = dict(build_ext=build_ext)
 
 long_description = """\
@@ -66,4 +65,3 @@ setup(
     ],
     cmdclass = cmdclass,
 )
-
